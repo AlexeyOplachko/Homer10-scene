@@ -1,0 +1,38 @@
+{
+    "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
+    "type": "app",
+    "name": "Homer 10",
+    "id": "homer10-app",
+    "info": {
+        "keywords": [
+            "app",
+            "homer",
+            "homer10"
+        ],
+        "description": "",
+        "author": {
+            "name": ""
+        },
+        "logos": {
+            "small": "img/logo.svg",
+            "large": "img/logo.svg"
+        },
+        "screenshots": [],
+        "version": "%VERSION%",
+        "updated": "%TODAY%"
+    },
+    "includes": [
+        {
+            "type": "page",
+            "name": "Homer 10",
+            "path": "/a/%PLUGIN_ID%/home",
+            "role": "Admin",
+            "addToNav": true,
+            "defaultNav": true
+        }
+    ],
+    "dependencies": {
+        "grafanaDependency": ">=10.0.3",
+        "plugins": []
+    }
+}
