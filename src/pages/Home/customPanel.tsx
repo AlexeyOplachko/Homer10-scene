@@ -100,12 +100,21 @@ const MyMultiSelect = ({ label, labels, labelValues, setLabelValues }: MyMultiSe
     return (
         <MultiSelect
             onKeyDown={(e: any) => {
-                // if (e.code === 'Enter') {
-                //     labelValues[label] = [...labelValues[label] ?? [], e.target.value];
-                //     setLabelValues(labelValues);
-                //     labels[label] = [...labels[label] ?? [], e.target.value];
-                //     setSelectValue([...selectValue, { label: e.target.value, value: e.target.value }])
-                // }
+                if (e.code === 'Enter') {
+                    const text = e.target.value;
+                    labelValues[label] = [...labelValues[label] ?? [], text];
+                    setLabelValues(labelValues);
+                    labels[label] = [...labels[label] ?? [], text];
+                    const newValue = [...selectValue, { label: text, value: text }]
+                    const newValueSet = new Set(newValue.map((i: any) => i.value));
+                    setSelectValue([...newValueSet].map((i: any) => ({ label: i, value: i })));
+                    setTimeout(() => {
+                        const input: any = document.getElementById(e.target.id)
+                        input.value = "";
+                        console.log(document.getElementById(e.target.id))
+                    }, 0);
+                }
+
             }}
             placeholder={label}
             key={label}
