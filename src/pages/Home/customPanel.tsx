@@ -100,12 +100,12 @@ const MyMultiSelect = ({ label, labels, labelValues, setLabelValues }: MyMultiSe
     return (
         <MultiSelect
             onKeyDown={(e: any) => {
-                if (e.code === 'Enter') {
-                    labelValues[label] = [...labelValues[label] ?? [], e.target.value];
-                    setLabelValues(labelValues);
-                    labels[label] = [...labels[label] ?? [], e.target.value];
-                    setSelectValue([...selectValue, { label: e.target.value, value: e.target.value }])
-                }
+                // if (e.code === 'Enter') {
+                //     labelValues[label] = [...labelValues[label] ?? [], e.target.value];
+                //     setLabelValues(labelValues);
+                //     labels[label] = [...labels[label] ?? [], e.target.value];
+                //     setSelectValue([...selectValue, { label: e.target.value, value: e.target.value }])
+                // }
             }}
             placeholder={label}
             key={label}
