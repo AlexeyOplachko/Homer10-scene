@@ -12,7 +12,7 @@ import {
 import React, { useMemo } from 'react';
 import { prefixRoute } from 'utils/utils.routing';
 import { ROUTES } from '../../constants';
-import { myCustomPanel } from './customPanel';
+import { searchPanel } from './searchPanel';
 import { getDataSourceSrv, locationService } from '@grafana/runtime';
 const queryRunner3 = new SceneQueryRunner({
     datasource: {
@@ -54,7 +54,7 @@ const tableQueryVariable = new CustomVariable({
 const flowQueryVariable = new CustomVariable({
     name: "flowQuery",
 })
-sceneUtils.registerRuntimePanelPlugin({ pluginId: 'my-scene-app-my-custom-viz', plugin: myCustomPanel });
+sceneUtils.registerRuntimePanelPlugin({ pluginId: 'search-panel', plugin: searchPanel });
 const getScene = () => {
     return new EmbeddedScene({
 
@@ -70,13 +70,13 @@ const getScene = () => {
                     width: "200px",
                     body: new VizPanel({
                         title: 'Search',
-                        pluginId: 'my-scene-app-my-custom-viz',
+                        pluginId: 'search-panel',
                         $data: queryRunner3
-                    })
+                    },)
                 })
                 , new SceneFlexItem({
                     body: new VizPanel({
-                        title: 'Flow 2',
+                        title: 'Flow',
                         pluginId: 'qxip-flow-panel',
                         $data: queryRunner2,
                         options: {

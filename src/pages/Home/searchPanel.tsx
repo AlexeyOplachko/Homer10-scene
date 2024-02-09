@@ -1,35 +1,71 @@
-import { PanelProps, PanelPlugin } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
+import { PanelPlugin, PanelProps } from '@grafana/data';
+import { getBackendSrv, locationService } from '@grafana/runtime';
 import { SceneDataProvider } from '@grafana/scenes';
-import { Button, MultiSelect } from '@grafana/ui';
-import React, { useEffect, useState } from 'react';
-import { SettingsModal } from './SettingsModal';
-import { TableModal } from './TableModal';
+import { Button, IconButton, MultiSelect } from '@grafana/ui';
+import React, { useCallback, useEffect, useState } from 'react';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { baseQuery } from './labels';
+import { SettingsModal } from './SettingsModal/SettingsModal';
+// import { TableModal } from './TableModal';
 interface CustomVizOptions {
+
+    labels: string[]
+    setLabels: Function;
+    inactiveLabels: string[];
+    setInactiveLabels: Function;
 }
 interface CustomVizFieldOptions {
-    data: SceneDataProvider;
+    // data: SceneDataProvider;
+    labels: string[]
 }
 export interface Props extends PanelProps<CustomVizOptions> { }
 export const CustomVizPanel = (props: Props) => {
+    console.log(props)
     const [labelValues, setLabelValues] = useState({})
-    // const [selectValue, setSelectValue] = React.useState<any>(value);
-    // const [forRerender, setForRerender] = React.useState<any>(0);
-    // if (bufferCheck !== JSON.stringify(valueLabelsName) || valueLabelsName?.length === 0) {
-    //   setTimeout(() => {
-    //     bufferCheck = JSON.stringify(valueLabelsName)
-    //     setSelectValue(value);
-    //     setForRerender(forRerender + 1);
-    //   }, 200)
-    // }
+
     const [serie] = props.data.series || [];
     const fields = serie?.fields || [];
     const [firstField]: any = fields;
     const outData = firstField?.values || [];
-    const valueLabelsName = Object.keys(outData?.[0] || {});
-    console.log("serie:", serie)
-    const labels: any = {};
+    const [labelNames, setLabelNames] = useState(Object.keys(outData?.[0] || {}))
+    const [activeLabels, setActiveLabels] = useState<string[]>([])
 
+    const [inactiveLabels, setInactiveLabels] = useState<string[]>([])
+
+    useEffect(() => {
+        const getPluginSettings = async () => {
+            const settings = await getBackendSrv().get(`api/plugins/homer10-app/settings`);
+            console.log(settings)
+            if (settings?.jsonData && Array.isArray(settings?.jsonData?.activeLabels) && Array.isArray(settings?.jsonData?.inactiveLabels)) {
+                setLabels(settings.jsonData.inactiveLabels, settings?.jsonData?.activeLabels)
+
+            } else {
+                try {
+                    const labels = JSON.parse(localStorage.getItem('search-fields') ?? '')
+                    setLabels(labels.inactiveLabels, labels.activeLabels)
+                } catch (e) {
+
+                }
+            }
+        };
+        getPluginSettings();
+    }, [])
+    const setLabels = useCallback((inactiveLabels: string[], activeLabels: string[]) => {
+        if (activeLabels.length > 0) {
+            setInactiveLabels(inactiveLabels.filter(label => labelNames.includes(label)))
+            setActiveLabels(activeLabels.filter(label => labelNames.includes(label)))
+        } else {
+            setActiveLabels(labelNames)
+        }
+    }, [])
+    useEffect(() => {
+        localStorage.setItem('search-fields', JSON.stringify({
+            activeLabels,
+            inactiveLabels
+        }))
+    }, [activeLabels, inactiveLabels])
+    const labels: any = {};
     outData.forEach((entry: any) => {
         for (const label in entry) {
             if (Array.isArray(labels[label])) {
@@ -43,31 +79,39 @@ export const CustomVizPanel = (props: Props) => {
         labels[label] = [...new Set(labels[label])]
     }
     return (
-        <div>
+        <div style={{ display: 'flex', height: "100%", flexDirection: "column" }}>
 
-            <SettingsModal {...props}></SettingsModal>
-            <TableModal  {...props} width={1000}></TableModal>
-            {valueLabelsName.map(label => {
-                return (
-                    <MyMultiSelect
-                        key={label}
-                        label={label}
-                        labels={labels}
-                        setLabelValues={setLabelValues}
-                        labelValues={labelValues}
-                    />
-                )
-            })}
-            <Button variant="primary" onClick={() => {
-                locationService.partial({ "var-flowQuery": '{job="heplify-server"} |= `` | regexp \"Call-ID:\\s+(?<callid>.+?\\r\\n)\"' }, true);
-                locationService.partial({ "var-tableQuery": '{job="heplify-server"} |= `` | regexp \"Call-ID:\\s+(?<callid>.+?\\r\\n)\"' }, true);
-                setLabelValues({})
-            }}>
-                Clear
-            </Button>
-            <SearchButton
-                setLabelValues={setLabelValues}
-                labelValues={labelValues} />
+
+            <DndProvider backend={HTML5Backend}>
+                <SettingsModal setLabels={setActiveLabels} labels={activeLabels} inactiveLabels={inactiveLabels} setInactiveLabels={setInactiveLabels} {...props}></SettingsModal></DndProvider>
+
+
+            {/* <TableModal  {...props} width={1000}></TableModal> */}
+            <div style={{ overflow: "auto", display: 'flex', height: "100%", flexDirection: "column" }}>
+                {activeLabels.map(label => {
+                    return (
+                        <MyMultiSelect
+                            key={label}
+                            label={label}
+                            labels={labels}
+                            setLabelValues={setLabelValues}
+                            labelValues={labelValues}
+                        />
+                    )
+                })}
+            </div>
+            <div>
+                <Button variant="primary" onClick={() => {
+                    locationService.partial({ "var-flowQuery": baseQuery }, true);
+                    locationService.partial({ "var-tableQuery": baseQuery }, true);
+                    setLabelValues({})
+                }}>
+                    Clear
+                </Button>
+                <SearchButton
+                    setLabelValues={setLabelValues}
+                    labelValues={labelValues} />
+            </div>
         </div>)
 };
 interface MyMultiSelectProps {
@@ -118,7 +162,7 @@ const MyMultiSelect = ({ label, labels, labelValues, setLabelValues }: MyMultiSe
             }}
             placeholder={label}
             key={label}
-            options={labels[label].map((i: string) => ({ label: i, value: i }))}
+            options={labels[label]?.map((i: string) => ({ label: i, value: i }))}
             value={selectValue}
             onChange={(v: any) => {
                 console.log(structuredClone(v))
@@ -162,14 +206,5 @@ const SearchButton = ({ labelValues }: SearchButtonProps) => {
     >Search</Button>)
 
 }
-export const myCustomPanel = new PanelPlugin<CustomVizOptions, CustomVizFieldOptions>(CustomVizPanel).useFieldConfig({
-    useCustomConfig: (builder) => {
-        builder.addNumberInput({
-            path: 'numericOption',
-            name: 'Numeric option',
-            description: 'A numeric option',
-            defaultValue: 1,
-        });
-    },
-});
+export const searchPanel = new PanelPlugin<CustomVizOptions, CustomVizFieldOptions>(CustomVizPanel).useFieldConfig({});
 
