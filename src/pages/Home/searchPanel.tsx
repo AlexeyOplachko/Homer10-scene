@@ -1,7 +1,6 @@
 import { PanelPlugin, PanelProps } from '@grafana/data';
 import { getBackendSrv, locationService } from '@grafana/runtime';
-import { SceneDataProvider } from '@grafana/scenes';
-import { Button, IconButton, MultiSelect } from '@grafana/ui';
+import { Button, MultiSelect } from '@grafana/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -21,14 +20,13 @@ interface CustomVizFieldOptions {
 }
 export interface Props extends PanelProps<CustomVizOptions> { }
 export const CustomVizPanel = (props: Props) => {
-    console.log(props)
     const [labelValues, setLabelValues] = useState({})
 
     const [serie] = props.data.series || [];
     const fields = serie?.fields || [];
     const [firstField]: any = fields;
     const outData = firstField?.values || [];
-    const [labelNames, setLabelNames] = useState(Object.keys(outData?.[0] || {}))
+    const [labelNames] = useState(Object.keys(outData?.[0] || {}))
     const [activeLabels, setActiveLabels] = useState<string[]>([])
 
     const [inactiveLabels, setInactiveLabels] = useState<string[]>([])
@@ -58,7 +56,7 @@ export const CustomVizPanel = (props: Props) => {
         } else {
             setActiveLabels(labelNames)
         }
-    }, [])
+    }, [labelNames])
     useEffect(() => {
         localStorage.setItem('search-fields', JSON.stringify({
             activeLabels,

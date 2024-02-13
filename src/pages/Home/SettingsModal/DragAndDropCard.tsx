@@ -15,6 +15,7 @@ export interface CardProps {
     id: string
     text: string
     moveCard: (id: string, to: number) => void
+    setCurrentCardID: (id: string) => void
     findCard: (id: string) => { index: number }
 }
 interface Item {
@@ -23,16 +24,17 @@ interface Item {
 }
 
 export const Card: FC<CardProps> = memo(function Card({
-    id,
+    id: cardID,
     text,
     moveCard,
-    findCard
+    findCard,
+    setCurrentCardID
 }) {
-    const originalIndex = findCard(id).index
+    const originalIndex = findCard(cardID).index
     const [{ isDragging }, drag] = useDrag(
         () => ({
             type: 'card',
-            item: { id, originalIndex },
+            item: { id: cardID, originalIndex },
             collect: (monitor) => ({
                 isDragging: monitor.isDragging(),
             }),
@@ -44,16 +46,18 @@ export const Card: FC<CardProps> = memo(function Card({
                 }
             },
         }),
-        [id, originalIndex, moveCard],
+        [cardID, originalIndex, moveCard],
     )
 
     const [, drop] = useDrop(
         () => ({
             accept: 'card',
             hover({ id: draggedId }: Item) {
-                if (draggedId !== id) {
-                    const { index: overIndex } = findCard(id)
+                console.log(draggedId, cardID)
+                if (draggedId !== cardID) {
+                    const { index: overIndex } = findCard(cardID)
                     moveCard(draggedId, overIndex)
+                    setCurrentCardID(cardID)
                 }
             },
         }),
@@ -63,7 +67,7 @@ export const Card: FC<CardProps> = memo(function Card({
     const opacity = isDragging ? 0 : 1
     return (
         <div ref={(node) => drag(drop(node))} style={{ ...style, opacity }}>
-                    {text}
+            {text}
         </div>
     )
 })
