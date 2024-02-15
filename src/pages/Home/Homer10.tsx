@@ -14,6 +14,8 @@ import { prefixRoute } from 'utils/utils.routing';
 import { ROUTES } from '../../constants';
 import { searchPanel } from './searchPanel';
 import { getDataSourceSrv, locationService } from '@grafana/runtime';
+import { ExportButtonPNG, ExportButtonTXT } from './exportButton';
+import { SettingDropdown } from 'components/SettingDropdown/SettingDropdown';
 const queryRunner3 = new SceneQueryRunner({
     datasource: {
         type: 'loki',
@@ -39,6 +41,7 @@ const queryRunner2 = new SceneQueryRunner({
             expr: '$flowQuery',
             queryType: "range",
             instant: true,
+            maxLines: 100
         },
     ],
 });
@@ -62,7 +65,7 @@ const getScene = () => {
         $variables: new SceneVariableSet({
             variables: [dsVariable, tableQueryVariable, flowQueryVariable]
         }),
-        $timeRange: new SceneTimeRange({ from: 'now-6h', to: 'now' }),
+        $timeRange: new SceneTimeRange({ from: 'now-10m', to: 'now' }),
         controls: [new SceneTimePicker({ isOnCanvas: true })],
         body: new SceneFlexLayout({
             children: [
@@ -79,6 +82,8 @@ const getScene = () => {
                         title: 'Flow',
                         pluginId: 'qxip-flow-panel',
                         $data: queryRunner2,
+                        headerActions: (<SettingDropdown
+                            dropdownItems={[ExportButtonPNG, ExportButtonTXT]} />),
                         options: {
                             source: 'src_ip',
                             destination: 'dst_ip',
@@ -113,8 +118,8 @@ const getHomer10AppScene = () => {
         pages: [
             new SceneAppPage({
                 $timeRange: new SceneTimeRange({ from: 'now-6h', to: 'now' }),
-                title: 'Homer 10',
-                subTitle: 'Search with flow and grid',
+                title: '',
+                subTitle: '',
                 url: prefixRoute(`${ROUTES.Home}`),
                 hideFromBreadcrumbs: true,
                 getScene,
@@ -126,5 +131,5 @@ const getHomer10AppScene = () => {
 export const Homer10Home = (props: any) => {
     console.log(props)
     const scene = useMemo(() => getHomer10AppScene(), []);
-    return <scene.Component model={scene} />;
+    return <scene.Component model={scene} />
 }
