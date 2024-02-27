@@ -13,3 +13,9 @@ export const ExportButtonTXT: DropdownItem = {
     onClick: () => document.dispatchEvent(new CustomEvent('export-flow-as-text'))
 
 }
+export const ExportButtonPCAP: DropdownItem = {
+    label: 'Export flow as PCAP',
+    icon: 'file-download',
+    onClick: () => document.dispatchEvent(new CustomEvent('export-flow-as-pcap'))
+
+}

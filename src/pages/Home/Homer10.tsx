@@ -14,7 +14,7 @@ import { prefixRoute } from 'utils/utils.routing';
 import { ROUTES } from '../../constants';
 import { searchPanel } from './searchPanel';
 import { getDataSourceSrv, locationService } from '@grafana/runtime';
-import { ExportButtonPNG, ExportButtonTXT } from './exportButton';
+import { ExportButtonPCAP, ExportButtonPNG, ExportButtonTXT } from './exportButton';
 import { SettingDropdown } from 'components/SettingDropdown/SettingDropdown';
 const queryRunner3 = new SceneQueryRunner({
     datasource: {
@@ -83,7 +83,7 @@ const getScene = () => {
                         pluginId: 'qxip-flow-panel',
                         $data: queryRunner2,
                         headerActions: (<SettingDropdown
-                            dropdownItems={[ExportButtonPNG, ExportButtonTXT]} />),
+                            dropdownItems={[ExportButtonPNG, ExportButtonTXT, ExportButtonPCAP]} />),
                         options: {
                             source: 'src_ip',
                             destination: 'dst_ip',
