@@ -4,7 +4,7 @@ import { Button, MultiSelect } from '@grafana/ui';
 import React, { useCallback, useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { baseQuery } from './labels';
+import { baseQuery, getLabelExtractions } from './labels';
 import { SettingsModal } from './SettingsModal/SettingsModal';
 // import { TableModal } from './TableModal';
 interface CustomVizOptions {
@@ -189,15 +189,18 @@ const SearchButton = ({ labelValues }: SearchButtonProps) => {
                 if (labelValuesArr.length > 1 && index !== labelValuesArr.length - 1) {
                     query += ", "
                 }
+
             });
             if (labelValuesArr.length === 0) {
-                locationService.partial({ "var-flowQuery": '{job="heplify-server"} |= `` | regexp \"Call-ID:\\s+(?<callid>.+?\\r\\n)\"' }, true);
+                locationService.partial({ "var-flowQuery": baseQuery }, true);
 
             } else {
                 console.log(labelValuesArr)
                 query += "} |= ``"
                 console.log(query)
-                locationService.partial({ "var-flowQuery": query }, true);
+                locationService.partial({
+                    "var-flowQuery": `${query} ${getLabelExtractions()}`
+                }, true);
             }
         }
         }

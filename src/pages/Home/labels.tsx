@@ -29,10 +29,11 @@ export const labels = [
     "To: <sip:(?<to_user>\\w+)",
     "From: <sip:(?<from_user>\\w+)",
     "To: <sip:.*@(?<to_domain>[a-zA-Z0-9.]+)",
-    "From: <sip:.*@(?<from_domain>[a-zA-Z0-9.]+)"
+    "From: <sip:.*@(?<from_domain>[a-zA-Z0-9.]+)",
+    "Call-ID:\\s+(?<callid>.+?)\\r\\n"
 
 ]
 export const getLabelExtractions = () => {
     return labels.map(label => `| regexp \"${label}\"`).join(' ')
 }
-export const baseQuery = `{job="heplify-server"} |= \`\` | regexp \"Call-ID:\\s+(?<callid>.+?)\\r\\n\"${getLabelExtractions()}`
+export const baseQuery = `{job="heplify-server"} |= \`\` ${getLabelExtractions()}`
