@@ -85,11 +85,33 @@ const getScene = () => {
                         headerActions: (<SettingDropdown
                             dropdownItems={[ExportButtonPNG, ExportButtonTXT, ExportButtonPCAP]} />),
                         options: {
-                            source: 'src_ip',
-                            destination: 'dst_ip',
-                            title: ["method", "type"],
-                            colorGenerator: ["callid"]
-                        }
+                                aboveArrow: "hostname",
+                                belowArrow: "node",
+                                colorGenerator: [
+                                    "callid",
+                                    "type"
+                                ],
+                                destination: [
+                                    "dst_ip",
+                                    "dst_port"
+                                ],
+                                destinationLabel: [
+                                    "dst_port"
+                                ],
+                                showbody: false,
+                                sortoption: "time_old",
+                                source: [
+                                    "src_ip",
+                                    "src_port"
+                                ],
+                                sourceLabel: [
+                                    "src_port"
+                                ],
+                                title: [
+                                    "response",
+                                    "type"
+                                ]
+                            }
                     })
                 }),
             ],
