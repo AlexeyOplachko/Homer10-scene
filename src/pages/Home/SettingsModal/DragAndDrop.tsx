@@ -6,6 +6,9 @@ import { Card } from './DragAndDropCard';
 
 const style = {
     width: 400,
+    border: '2px solid rgba(204, 204, 220, 0.12)',
+    borderRadius: '2px',
+    margin: '0 5px 0px 5px',
 }
 
 export interface ContainerState {
@@ -13,15 +16,15 @@ export interface ContainerState {
 }
 
 interface FieldDragAndDropModel {
-    labels: string[]
-    setLabels: Function;
+    activeLabels: string[]
+    setActiveLabels: Function;
     inactiveLabels: string[];
     setInactiveLabels: Function;
 }
-export const FieldDragAndDrop = memo(function Container({ labels, setLabels, inactiveLabels, setInactiveLabels }: FieldDragAndDropModel) {
+export const FieldDragAndDrop = memo(function Container({ activeLabels, setActiveLabels, inactiveLabels, setInactiveLabels }: FieldDragAndDropModel) {
     const [currentCardID, setCurrentCardID] = useState('')
     const [inactiveCards, setInactiveCards] = useState<string[]>(inactiveLabels)
-    const [activeCards, setActiveCards] = useState(labels)
+    const [activeCards, setActiveCards] = useState(activeLabels)
     const findCard = useCallback(
         (id: string, side: "active" | "inactive") => {
             const array = side === 'active' ? activeCards : inactiveCards;
@@ -70,7 +73,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
                     }),
                 )
 
-                setLabels(update(activeCards, {
+                setActiveLabels(update(activeCards, {
                     $splice: [
                         [index, 1],
                         [atIndex, 0, card],
@@ -78,7 +81,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
                 }))
             }
         },
-        [findCard, inactiveCards, setInactiveCards, activeCards, setActiveCards, setLabels, setInactiveLabels],
+        [findCard, inactiveCards, setInactiveCards, activeCards, setActiveCards, setActiveLabels, setInactiveLabels],
     )
 
     const switchSide = useCallback((side: 'active' | 'inactive', id: string) => {
@@ -114,7 +117,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
                     ],
                 }),
             )
-            setLabels(newActive)
+            setActiveLabels(newActive)
             setInactiveLabels(
                 update(inactiveCards, {
                     $splice: [
@@ -144,7 +147,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
                 }),
             )
 
-            setLabels(
+            setActiveLabels(
                 update(activeCards, {
                     $splice: [
                         [index, 0],
@@ -154,7 +157,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
             )
             setInactiveLabels(newInactive)
         }
-    }, [activeCards, inactiveCards, setActiveCards, setInactiveCards, setInactiveLabels, setLabels, currentCardID, findCard])
+    }, [activeCards, inactiveCards, setActiveCards, setInactiveCards, setInactiveLabels, setActiveLabels, currentCardID, findCard])
     const [, drop] = useDrop(() => ({
         accept: 'card', drop: (item: any) => { switchSide('active', item.id) },
         collect: (monitor) => ({
@@ -204,6 +207,7 @@ export const FieldDragAndDrop = memo(function Container({ labels, setLabels, ina
                         setCurrentCardID={setCurrentCardID}
                         findCard={(id) => findCard(id, "active")}
                     />
+
                 )}
             </div>
         </div>

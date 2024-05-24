@@ -3,7 +3,7 @@ import { AppPluginMeta, GrafanaTheme2, PluginConfigPageProps, PluginMeta } from 
 import { getBackendSrv, locationService } from '@grafana/runtime';
 import { Button, FieldSet, useStyles2 } from '@grafana/ui';
 import React from 'react';
-import { lastValueFrom } from 'rxjs';
+// import { lastValueFrom } from 'rxjs';
 import { testIds } from '../testIds';
 
 export type JsonData = {
@@ -92,13 +92,13 @@ const updatePluginAndReload = async (pluginId: string, data: Partial<PluginMeta<
 };
 
 export const updatePlugin = async (pluginId: string, data: Partial<PluginMeta>) => {
-    const response = getBackendSrv().fetch({
-        url: `/api/plugins/${pluginId}/settings`,
-        method: 'POST',
-        data,
-    });
+    // const response = getBackendSrv().fetch({
+    //     url: `/api/plugins/${pluginId}/settings`,
+    //     method: 'POST',
+    //     data,
+    // });
 
-    const dataResponse = await lastValueFrom(response);
+    // const dataResponse: any = await lastValueFrom(response);
 
-    return dataResponse.data;
+    // return dataResponse.data;
 };

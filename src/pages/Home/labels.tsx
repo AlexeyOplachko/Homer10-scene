@@ -25,15 +25,25 @@ export const fields = [
     "profile",
     "node"
 ]
-export const labels = [
-    "To: <sip:(?<to_user>\\w+)",
-    "From: <sip:(?<from_user>\\w+)",
-    "To: <sip:.*@(?<to_domain>[a-zA-Z0-9.]+)",
-    "From: <sip:.*@(?<from_domain>[a-zA-Z0-9.]+)",
-    "Call-ID:\\s+(?<callid>.+?)\\r\\n"
-
-]
-export const getLabelExtractions = () => {
-    return labels.map(label => `| regexp \"${label}\"`).join(' ')
+export const labelsForExtraction: { [key: string]: string } = {
+    to_user: "To: <sip:(?<to_user>\\w+)",
+    from_user: "From: <sip:(?<from_user>\\w+)",
+    to_domain: "To: <sip:.*@(?<to_domain>[a-zA-Z0-9.]+)",
+    from_domain: "From: <sip:.*@(?<from_domain>[a-zA-Z0-9.]+)",
+    callid: "Call-ID:\\s+(?<callid>.+?)\\r\\n"
 }
-export const baseQuery = `{job="heplify-server"} |= \`\` ${getLabelExtractions()}`
+export const getLabelExtractions = (labels: string[]) => {
+    let returnString = '';
+    labels.forEach(label => {
+        if (labelsForExtraction[label]) {
+            returnString += `| regexp \"${labelsForExtraction[label]}\" `
+        }
+    })
+    return returnString
+}
+export const baseQuery = `{job="heplify-server"} |= \`\``
+
+export const getLabelExtractionsForSearchPanel = () => {
+    return Object.values(labelsForExtraction).map(label => `| regexp \"${label}\"`).join(' ')
+}
+export const searchPanelQuery = `{job="heplify-server"} ${getLabelExtractionsForSearchPanel()}`
